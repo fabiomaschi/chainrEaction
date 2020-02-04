@@ -7,4 +7,4 @@ export { SupplyChain } from './supplychain';
 export const contracts: any[] = [ SupplyChain ];
 
 //import {Bet, Data} from './datatypes';
-export {ItemInfo, Evaluation } from './datatypes';
+export {Evaluation, ItemInfo, Phone, PhoneState, Balance} from './datatypes';

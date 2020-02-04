@@ -69,5 +69,9 @@ export abstract class BasicContract extends Contract {
     protected async replace<T>(ctx: Context, whatis: string, id: string, val: T) {
         await this.create(ctx, whatis, id, val);
     }
+    protected async remove<T>(ctx: Context, k: string) {
+        await ctx.stub.deleteState(k)
+
+    }
 
 }

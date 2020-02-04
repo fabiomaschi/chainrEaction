@@ -80,7 +80,7 @@ function showItemToEval(tag) {
 }
 
 function loadEvaluatorPage() {
-    loadFromUrlNoParse("/evaluations",  { }, "#log-items", 
+     ("/evaluations",  { }, "#log-items", 
         function (rslt) {
             rslt = JSON.parse(rslt);  
             if (rslt.length == 0) { return "<p>No evaluated items at the moment</p>"; }
