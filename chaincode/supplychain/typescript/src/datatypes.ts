@@ -9,13 +9,11 @@ export interface Evaluation {
  The info we are interested in here are "transfer of ownership" of sort,
  e.g. "farmer F0 (src) to shipper S1 (dst)"
  */
-export interface ItemInfo {
+export interface PhoneInfo {
     docType?: string;
 
-    item: string;  // a tag describing what this item is (e.g. cabbage)
-
-    footprint: string; // (encrypted) data on impact of information
-
-    src: string;
-    dst: string;
+    uuid: string; // universally unique identifier
+    model: string;
+    manufacturer: string;
+    tokensPrice: number;
 }

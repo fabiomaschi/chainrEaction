@@ -94,6 +94,53 @@ async function dispatchCmd(args, contract):Promise<string>
 
     /* NB: one needs submitTransaction for updates and evaluateTransaction for queries */
     switch (args["cmd"]) {
+        case "addPhone":
+        {
+            const info = {
+                "docType" : "phoneInfo",
+                "uuid"  : args["uuid"],
+                "model" : args["model"],
+                "manufacturer" : args["manufacturer"],
+                "tokensPrice" : args["tokensPrice"]
+            };
+            const info_str = JSON.stringify(info as chaincode.PhoneInfo)
+            await contract.submitTransaction('addPhone', info_str);
+            return JSON.stringify(`Successfully produced phone #${args["uuid"]}!`);
+        }
+        case "sellPhone":
+        {
+            const info = {
+                "uuid" : args["uuid"],
+                "user" : args["user"],
+            };
+            const info_str = JSON.stringify(info);
+            await contract.submitTransaction('sellPhone', info_str);
+            return JSON.stringify(`Successfully sold phone #${args["uuid"]}!`);
+        }
+
+        case "listProducedPhones":
+        {
+            const result = await contract.evaluateTransaction('listProducedPhones', args["manufacturer"]);
+            return result;
+        }
+        case "listReceivedForRecycling":
+        {
+            const result = await contract.evaluateTransaction('listReceivedForRecycling', args["manufacturer"]);
+            return result;
+        }
+
+        case "queryLifetimeByManufacturer":
+        {
+            const result = await contract.evaluateTransaction('queryLifetimeByManufacturer', args["manufacturer"]);
+            return result;
+        }
+        case "queryNumberOfProducedPhonesByManufacturer":
+        {
+            const result = await contract.evaluateTransaction('queryNumberOfProducedPhonesByManufacturer', args["manufacturer"]);
+            return result;
+        }
+
+
         case "reset":{  
             await contract.submitTransaction('clearAllState');
             return JSON.stringify("Success."); }
@@ -114,24 +161,18 @@ async function dispatchCmd(args, contract):Promise<string>
             return result; }
         case "queryItemInfosBySrc": { // requires --src
             const result = await contract.evaluateTransaction('queryInfosByItemSrc', args["src"]);
-            return result;
-        }
-        case "queryItemInfoByIdx": {
+            return result; }
+        case "gitqueryItemInfoByIdx": {
             const result = await contract.evaluateTransaction('queryItemInfoByIdx', args["idx"].toString());
-            return result;
-        }
+            return result; }
         case "queryPendingItemInfos": { // requires --user
             const result = await contract.evaluateTransaction('queryPendingItemInfos', args["user"]);
-            return result;
-        }
-        
+            return result; }
         case "queryEvaluation": { // requires --item
-            const result = await contract.evaluateTransaction(
-                'queryEvaluation', args["item"].toString());
+            const result = await contract.evaluateTransaction('queryEvaluation', args["item"].toString());
             return result; }
         case "updateEvaluation": { // requires --item
-            await contract.submitTransaction(
-                'updateEvaluationOnItem', args["item"].toString());
+            await contract.submitTransaction('updateEvaluationOnItem', args["item"].toString());
             return JSON.stringify("Success."); }
         case "addItemInfo": { // requires --idx, --item, --src, --dst and --footprint
             const info = {
@@ -141,7 +182,7 @@ async function dispatchCmd(args, contract):Promise<string>
                 "dst" : args["dst"],
                 "footprint" : encrypt(args["footprint"].toString()) // we encrypt footprint
             };
-            const info_str = JSON.stringify(info as chaincode.ItemInfo);
+            const info_str = JSON.stringify(info as chaincode.PhoneInfo);
             await contract.submitTransaction(
                 'addSimple', 
                 "iteminfo" + args["idx"].toString(),
