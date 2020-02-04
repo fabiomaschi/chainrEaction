@@ -2,33 +2,33 @@
 <html>
 <head>
     <title>
-       iPhone 11  {% block title %}{% endblock %}
+        iPhone 11  {% block title %}{% endblock %}
     </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='iphone.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type=text/javascript src="{{ url_for('static', filename='client.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='client.js') }}"></script>
 </head>
-  
-  
+
+
 <body>
-<div class="container">
-  <div class="right-colum">
-<img src="https://images-na.ssl-images-amazon.com/images/I/61gNxUgg%2BlL._AC_SL1500_.jpg?w=780" alt="iPhone 11" style="height:500px">
-  </div>
-    
-   <div class="left-column">
-     <div class="product-description">
-    <h1> iPhone 11</h1>
-    <p><img src="https://lh6.googleusercontent.com/proxy/1WsbnhGftsodBtVSrVvK5FZt603kaqx4g9cq_qriSxZ_g9fAAQCmkCmAU_K1-uNLujvkB4G4AIz38Prlxjuf9L19" alt="laughing" width="35" /> <strong><stan style="font-size:30pt;color:green">1,567 </stan> iPhones 11 recycled since 2019.</strong>
-        <p><strong><stan style="font-size:20pt;color:gray">Average lifetime: </stan> 2.5 years</strong>
-    <p>iPhone 11 684GB</p>
-     <p>Price: 820$</p>
-     <p>Tokens: 250</p>
-     </div>
-     <div class="cable-choose">
-     <button>Buy</button>
-       </div>
- </div>
-  
-  </div>
+    <div class="container">
+        <div class="left-column">
+            <img data-image="red" class="active" src="https://images-na.ssl-images-amazon.com/images/I/61gNxUgg%2BlL._AC_SL1500_.jpg?w=780" style="height:450px">
+        </div>
+
+        <div class="right-column">
+            <div class="product-description">
+                <h1> IPhone 11</h1>
+                <p><img src="https://lh6.googleusercontent.com/proxy/1WsbnhGftsodBtVSrVvK5FZt603kaqx4g9cq_qriSxZ_g9fAAQCmkCmAU_K1-uNLujvkB4G4AIz38Prlxjuf9L19" alt="laughing" width="35" /> <strong><stan style="font-size:24pt;color:green">1,567 </stan> iPhones 11 recycled since 2019.</strong>
+                <p><strong><stan style="font-size:18pt;color:gray">Average lifetime: </stan> 2.5 years</strong><br>
+                <p>iPhone 11 256GB</p>
+                <p>Price: 820$</p>
+                <p>Tokens granted: 250</p>
+                <form action="buy">
+                    <input type="submit" value="Buy">
+                </form>
+            </div>
+        </div>
+
+    </div>
 </body>

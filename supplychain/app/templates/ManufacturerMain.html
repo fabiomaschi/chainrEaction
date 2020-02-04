@@ -4,66 +4,125 @@
     <title>
         Apple Main Page {% block title %}{% endblock %}
     </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='manumain.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type=text/javascript src="{{ url_for('static', filename='client.js') }}"></script>
-  
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <script type="text/javascript" src="{{ url_for('static', filename='client.js') }}"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
-  
-  
+
+
 <body>
-  <div class="search" style="padding: 2em 0 4em 0">
-      <input type="text" class="searchTerm" placeholder="Search for a model">
-      <button type="submit" class="searchButton">
-        <i class="fa fa-search"></i>
-     </button>
-   </div>
-  
-  
-  
-<div class="index-gallery" style="padding: 8em 0 2em 0">
-  <div class="item">
-    <img src="https://images-na.ssl-images-amazon.com/images/I/61gNxUgg%2BlL._AC_SL1500_.jpg?w=780" alt="iPhone 11" style="height:200px">
-    <p>iPhone 11</p>
-  </div>
 
-  <div class="item">
-    <img src="https://www.myitshop.com.au/wp-content/uploads/iphone-x-transparent.png?w=780" alt="iPhone X" style="height:200px">
-    <p>iPhone X</p>
-  </div>
-  <div class="item">
-    <img src="https://images-na.ssl-images-amazon.com/images/I/51rxj5TepeL.jpg" alt="iPhone 7" style="height:200px">
-    <p>iPhone 7</p>
-  </div>
-   <div class="item">
-    <img src=" https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/ipad-wifi-select-silver-201909_GEO_ES_FMT_WHH?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1567896980352" alt="iPad 10" style="height:200px">
-    <p>iPad 10</p>
-  </div>
-  
-  <div class="item">
-    <img src=" https://www.goldenmac.es/productos/imagenes/img_13556_2285f36cf9b709ef5106eb35254e710e_20.jpg" alt="iPad Pro" style="height:200px">
-    <p>iPad Pro</p>
-  </div>
-  
-  <div class="item">
-    <img src="https://media.ldlc.com/r1600/ld/products/00/05/27/22/LD0005272286_2.jpg" alt="iPad Mini" style="height:200px">
-    <p>iPad Mini</p>
-  </div>
-  
-  <div class="item">
-    <img src=" https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/macbook-air-space-gray-select-201810?wid=892&hei=820&&qlt=80&.v=1541713862468" alt="MacBook Air" style="height:200px">
-    <p>MacBook Air</p>
-  </div>
-  
-  <div class="item">
-    <img src=" https://images-na.ssl-images-amazon.com/images/I/71pheYd9W0L._AC_SL1500_.jpg" alt="iMac" style="height:200px">
-    <p>iMac</p>
-  </div>
-  </div>
+    <div id="mySidenav" class="sidebar">
+        <a id="b0" class="active" href="#" onclick="return toggle('b0','pg0')">
+            Product database
+        </a>
+        <a id="b1" href="#" onclick="return toggle('b1','pg1')">Pending recycled phones </a>
+    </div>
 
-  
-    
-    
+    <div id="page">
+
+        <div id="pg0" class="page">
+
+            <div class="search" style="padding: 2em 0 4em 0">
+                <input type="text" class="searchTerm" placeholder="Search for a model">
+                <button type="submit" class="searchButton">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+
+
+
+            <div class="index-gallery">
+                <div class="item">
+                    <img src="https://images-na.ssl-images-amazon.com/images/I/61gNxUgg%2BlL._AC_SL1500_.jpg?w=780" alt="iPhone 11" style="height:200px">
+                    <p>iPhone 11</p>
+                </div>
+
+                <div class="item">
+                    <img src="https://www.myitshop.com.au/wp-content/uploads/iphone-x-transparent.png?w=780" alt="iPhone X" style="height:200px">
+                    <p>iPhone X</p>
+                </div>
+                <div class="item">
+                    <img src="https://images-na.ssl-images-amazon.com/images/I/51rxj5TepeL.jpg" alt="iPhone 7" style="height:200px">
+                    <p>iPhone 7</p>
+                </div>
+                <div class="item">
+                    <img src=" https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/ipad-wifi-select-silver-201909_GEO_ES_FMT_WHH?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1567896980352" alt="iPad 10" style="height:200px">
+                    <p>iPad 10</p>
+                </div>
+
+                <div class="item">
+                    <img src=" https://www.goldenmac.es/productos/imagenes/img_13556_2285f36cf9b709ef5106eb35254e710e_20.jpg" alt="iPad Pro" style="height:200px">
+                    <p>iPad Pro</p>
+                </div>
+
+                <div class="item">
+                    <img src="https://media.ldlc.com/r1600/ld/products/00/05/27/22/LD0005272286_2.jpg" alt="iPad Mini" style="height:200px">
+                    <p>iPad Mini</p>
+                </div>
+
+                <div class="item">
+                    <img src=" https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/macbook-air-space-gray-select-201810?wid=892&hei=820&&qlt=80&.v=1541713862468" alt="MacBook Air" style="height:200px">
+                    <p>MacBook Air</p>
+                </div>
+
+                <div class="item">
+                    <img src=" https://images-na.ssl-images-amazon.com/images/I/71pheYd9W0L._AC_SL1500_.jpg" alt="iMac" style="height:200px">
+                    <p>iMac</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="pg1" class="page hidden">
+            <h1 class="h1"> All Unsold Phones</h1>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+
+function toggle(buttonID,page) {
+   var current = document.getElementById('mySidenav').getElementsByTagName('a');
+  for (var i=0; i<current.length; i++) {
+    current[i].classList.remove("active");
+  }
+  var button = document.getElementById(buttonID);
+  button.classList.add("active");
+
+  var cont = document.getElementById('page');
+  var sel = cont.getElementsByTagName('div');
+  for (var i=0; i<sel.length; i++) {
+    if (sel[i].id != page) { sel[i].classList.remove("visible");
+sel[i].classList.add("hidden"); }
+    else{
+      sel[i].classList.remove("hidden");
+sel[i].classList.add("visible");
+    }
+  }
+  return false;
+}
+
+function mkPhone(serial, name, rslt) {
+    let html_string = `
+    <div class="phone">
+  <div class="checkbox">
+  <input type="radio" name="vehicle1" value="Bike">
+  </div>
+  <div class="left-column">
+    <img data-image="red" class="active" src="https://www.tuimeilibre.com/4075-large_default/apple-iphone-11-64gb-negro-libre.jpg" height=100px >
+  </div>
+  <div class="right-column">
+    <div class="product-description">
+      <h2>${name}</h2>
+      <p>${serial}</p>
+    </div>
+  </div>
+</div>`
+      return html_string;
+
+}
+    </script>
 </body>
 

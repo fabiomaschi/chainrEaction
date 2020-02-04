@@ -60,7 +60,7 @@ async function main() {
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
         process.exit(1);
-    }
+    } 
 }
 
 // for encryption/decryption
