@@ -1,0 +1,60 @@
+﻿<div id="mySidenav" class="sidebar">
+    <a id="b0" class="active" href="#" onclick="return toggle('b0','pg0')">Pending arrivals</a>
+    <a id="b1" href="#" onclick="return toggle('b1','pg1')">Unsold phones </a>
+    <a id="b2" href="#" onclick="return toggle('b2','pg2')">Sold phones</a>
+    <a id="b3" href="#" onclick="return toggle('b3','pg3')">Pending recycled phones</a>
+</div>
+
+<div id="main">
+    <div id="page">
+        <div id="pg0" class="page"> <h1 class="h1"> All Pending Arrival Confirmations </h1> </div>
+        <div id="pg1" class="page hidden"> <h1 class="h1"> All Unsold Phones</h1> </div>
+        <div id="pg2" class="page hidden"> <h1 class="h1"> All Sold Phones </h1> </div>
+        <div id="pg3" class="page hidden"> <h1 class="h1"> All Pending Recycled Phones </h1> </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+function toggle(buttonID,page) {
+   var current = document.getElementById('mySidenav').getElementsByTagName('a');
+  for (var i=0; i<current.length; i++) {
+    current[i].classList.remove("active");
+  }
+  var button = document.getElementById(buttonID);
+  button.classList.add("active");
+
+  var cont = document.getElementById('page');
+  var sel = cont.getElementsByTagName('div');
+  for (var i=0; i<sel.length; i++) {
+    if (sel[i].id != page) { sel[i].classList.remove("visible");
+sel[i].classList.add("hidden"); }
+    else{
+      sel[i].classList.remove("hidden");
+sel[i].classList.add("visible");
+    }
+  }
+  return false;
+}
+
+function mkPhone(serial, name, rslt) {
+    let html_string = `
+    <div class="phone">
+  <div class="checkbox">
+  <input type="radio" name="vehicle1" value="Bike">
+  </div>
+  <div class="left-column">
+    <img data-image="red" class="active" src="https://www.tuimeilibre.com/4075-large_default/apple-iphone-11-64gb-negro-libre.jpg" height=100px >
+  </div>
+  <div class="right-column">
+    <div class="product-description">
+      <h2>${name}</h2>
+      <p>${serial}</p>
+    </div>
+  </div>
+</div>`
+      return html_string;
+
+}
+</script>
