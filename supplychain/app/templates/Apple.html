@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        Apple Main Page {% block title %}{% endblock %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='client.js') }}"></script>
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+</head>
+  
+  
+<body>
+  <div class="search">
+      <input type="text" class="searchTerm" placeholder="Apple">
+      <button type="submit" class="searchButton">
+        <i class="fa fa-search"></i>
+     </button>
+   </div>
+  
+  
+  <div class=product-description>
+<h1 style=" padding: 2em 0 1em 0; text-align:center"> Apple <img src=https://www.stickpng.com/assets/images/580b57fcd9996e24bc43c516.png
+ alt="apple" width="90" /></h1>
+  
+  
+<p style="text-align:center"><img src="https://lh6.googleusercontent.com/proxy/1WsbnhGftsodBtVSrVvK5FZt603kaqx4g9cq_qriSxZ_g9fAAQCmkCmAU_K1-uNLujvkB4G4AIz38Prlxjuf9L19" alt="laughing" width="35" /> <strong><stan style="font-size:30pt;color:green">2,000,567 </strong></stan> products recycled since 2019.</p>
+    <p style="text-align:center"><strong><stan style="font-size:20pt;color:gray">Average lifetime: </strong></stan> 4.8 years.</p>
+  </div>
+    
+<div class="index-gallery" style="padding: 3em 0 2em 0">
+  <div class="item">
+    <a href="/iPhone">
+    <img src="https://images-na.ssl-images-amazon.com/images/I/61gNxUgg%2BlL._AC_SL1500_.jpg?w=780" alt="iPhone 11" style="height:200px">
+    </a>
+    <p>iPhone 11</p>
+  </div>
+
+  <div class="item">
+    <img src="https://www.myitshop.com.au/wp-content/uploads/iphone-x-transparent.png?w=780" alt="iPhone X" style="height:200px">
+    <p>iPhone X</p>
+  </div>
+  <div class="item">
+    <img src="https://images-na.ssl-images-amazon.com/images/I/51rxj5TepeL.jpg" alt="iPhone 7" style="height:200px">
+    <p>iPhone 7</p>
+  </div>
+   <div class="item">
+    <img src=" https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/ipad-wifi-select-silver-201909_GEO_ES_FMT_WHH?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1567896980352" alt="iPad 10" style="height:200px">
+    <p>iPad 10</p>
+  </div>
+  </div>
+</div>
+  
+    
+    
+</body>
+
