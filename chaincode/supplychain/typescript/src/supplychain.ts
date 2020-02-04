@@ -3,8 +3,8 @@
  */
 
 import { Context } from 'fabric-contract-api';
-import {BasicContract } from './basiccontract';
-import { Evaluation, ItemInfo } from './datatypes';
+import { BasicContract } from './basiccontract';
+import { Evaluation, ItemInfo, Phone, PhoneState, Balance } from './datatypes';
 import * as NodeRSA from 'node-rsa';
 
 /* Crypto functions */
@@ -69,175 +69,64 @@ function computeEvaluation(infos: ItemInfo[]):string
 }
 
 export class SupplyChain extends BasicContract {
-    static evalIndexName:string = 'item~eval';
+    static evalIndexName:string = 'state~id';
+    static buyerIndexName: string = 'owner~id';
 
     public async initLedger(ctx: Context) {
         console.info('============= START : Initialize Ledger ===========');
-        await this.reset(ctx);
+        
         console.info('============= END : Initialize Ledger ===========');
     }
+    //Manufacturer
+    // producePhone .
+    // listProduced .
+    // dispatchToSupplier .
+    // listReceivedForRecycle
+    // recycle .f
 
-    protected async insertEvaluation(ctx: Context, tag: string, evaluation: string)
+    //Supplier
+    // listReceivedFromManufacturer .
+    // confirmReceived .
+    // sellToBuyer .
+    // dispatchToManufacturer .
+
+    //Buyer
+    // listPhones .
+    // listRecyleStatus
+    // viewTokens .
+    // redeemToken .
+
+    public async producePhone(ctx: Context, id: string, data: string)
+    {
+        await this.create(ctx, 'phone', id, JSON.parse(data));
+    }
+    public async listProduced(ctx: Context, manufacturer: string)
+    {
+        const allPhones = await this.grabAllInfos(ctx);
+
+        let phonesWeCareAbout = [];
+        for (let x of allPhones) {
+            if (x.manufacturer == manufacturer) {
+                phonesWeCareAbout.push(x);
+            }
+        }
+        
+        return JSON.stringify(phonesWeCareAbout);
+    }
+    protected async dispatchToSupplier(ctx: Context, id: string, data: string)
     {
         let indexKey = await ctx.stub.createCompositeKey(
-            SupplyChain.evalIndexName, [tag, evaluation]);
+            SupplyChain.evalIndexName, ['dispatchedToSupplier', id]);
         console.info(indexKey);
-        //  Save index entry to state. Only the key name is needed, no need to store a duplicate copy of the marble.
-        //  Note - passing a 'nil' value will effectively delete the key from state, therefore we pass null character as value
-        await ctx.stub.putState(indexKey, Buffer.from('\u0000'));
+        await ctx.stub.putState(indexKey, JSON.parse(data));
     }
-
-    public async reset(ctx:Context) {
-        await this.insertEvaluation(ctx, "Carrot", ":-)");
-    }
-
-    public async querySimple(ctx: Context, k: string): Promise<string>
+    public async listReceivedFromManufacturer(ctx: Context, supplier_id: string): Promise<string>
     {
-        const valAsBytes = await ctx.stub.getState(k);  
-        if (!valAsBytes || valAsBytes.length === 0) {
-            throw new Error(`${k} does not exist`);
-        }
-        console.log(valAsBytes.toString());
-        return JSON.parse(valAsBytes.toString());
-    }
-
-    public async addSimple(ctx: Context, k: string, v:string)
-    {
-        await ctx.stub.putState(k, Buffer.from(JSON.stringify(v)));
-    }
-
-    public async addItemInfo(ctx: Context, id: string, ii:string)
-    {
-        await this.create(ctx, 'iteminfo', id, JSON.parse(ii));
-    }
-
-    // the id of the evaluation is the item id it refers to
-    public async updateEvaluationOnItem(ctx:Context, tgtTag: string) {
-        const infosStr = await this.queryInfosByItemTag(ctx, tgtTag);
-        const infos:ItemInfo[] = JSON.parse(infosStr);
-        console.log("== Updating evaluation ==");
-        console.log(infos);
-        // compute evaluation
-        const e = computeEvaluation(infos);
-        await this.insertEvaluation(ctx, tgtTag, e);
-    }
-
-    /*  Returns a single evaluations related to item */
-    public async queryEvaluationByItem(ctx:Context, tgtTag:string): Promise<string> {
-        return await this.query(ctx, 'evaluation', tgtTag);
-    }
-  
-    public async queryAllItemInfos(ctx: Context):Promise<string> {
-        return await this.queryFullRange(ctx, 'iteminfo');
-    }
-
-    public async queryItemInfoByIdx(ctx: Context, id: string):Promise<string> {
-        return await this.query(ctx, 'iteminfo', id);
-    }
-
-    public async grabAllInfos(ctx: Context):Promise<ItemInfo []> {
-        const infosStr = await this.queryAllItemInfos(ctx);
-        const infosKV = JSON.parse(infosStr);
-        //const infosKeys = infosKV.map(it => it["Key"]); 
-        const allInfos = infosKV.map(it => JSON.parse(it["Record"])); 
-        console.log(allInfos);
-
-        return allInfos;
-    }
-
-    // returns a list [iteminfo ] related to item "item"
-    public async queryInfosByItemTag(ctx: Context, tgtTag: string):Promise<string> {
-        const allInfos = await this.grabAllInfos(ctx);
-
-        let infosWeCareAbout = [];
-        for (let x of allInfos) {
-            if (x.item == tgtTag) {
-                infosWeCareAbout.push(x);
-            }
-        }
-        
-        return JSON.stringify(infosWeCareAbout);
-    }
-
-    public async queryInfosByItemSrc(ctx: Context, tgtSrc: string):Promise<string> {
-        const allInfos = await this.grabAllInfos(ctx);
-
-        let infosWeCareAbout = [];
-        for (let x of allInfos) {
-            if (x.src == tgtSrc) {
-                infosWeCareAbout.push(x);
-            }
-        }
-
-        return JSON.stringify(infosWeCareAbout);
-    }
-
-    public async queryInfosByItemDst(ctx: Context, tgtDst: string):Promise<string> {
-        const allInfos = await this.grabAllInfos(ctx);
-        
-        let infosWeCareAbout = [];
-        for (let x of allInfos) {
-            if (x.dst == tgtDst) {
-                infosWeCareAbout.push(x);
-            }
-        }
-
-        return JSON.stringify(infosWeCareAbout);
-    }
-
-    public async queryItemsInDistribution(ctx: Context):Promise<string> {
-        // Get list of items arrived at Distributor ("D")
-        const rsltStr = await this.queryInfosByItemDst(ctx, "D");
-        const rsltItems = JSON.parse(rsltStr).map(x => x.item);
-
-        return JSON.stringify(rsltItems);
-    }
-
-    /*
-        Return all item infos of which the user is the current endpoint 
-        (i.e. the user received it but hasn't shipped it yet)
-    */
-    public async queryPendingItemInfos(ctx: Context, tgtUser: string): Promise<string> {
-        const receivedItemInfosStr = await this.queryInfosByItemDst(ctx, tgtUser);
-        const receivedItemInfos:ItemInfo [] = JSON.parse(receivedItemInfosStr);
-
-        const shippedItemsInfosStr = await this.queryInfosByItemSrc(ctx, tgtUser);
-        const shippedItems:string [] = JSON.parse(shippedItemsInfosStr).map(it => it.item);
-
-        let pendingItems = [];
-        for (let rcvdItem of receivedItemInfos) {
-            if (!shippedItems.includes(rcvdItem.item)) {
-                pendingItems.push(rcvdItem);
-            }
-        }
-
-        return JSON.stringify(pendingItems); 
-    }
-
-    public async queryItemsWaitingEval(ctx: Context): Promise<string>
-    {
-        const allEvalsStr = await this.queryAllEvaluations(ctx);
-        const allEvaledItems = JSON.parse(allEvalsStr).map(x => x[0]);
-
-        const allItemsInDistStr = await this.queryItemsInDistribution(ctx);
-        
-        let ret = [];
-        for (let x of JSON.parse(allItemsInDistStr)) {            
-            if (!allEvaledItems.includes(x)) {
-                // not evaluated yet, then it's pending
-                ret.push(x);
-            }
-        }
-        return JSON.stringify(ret);
-    }
-
-    public async queryAllEvaluations(ctx: Context): Promise<string> {
-
         let ret = [];
         
         // This will execute a key range query on all keys for evalIndexName
         let resultsIterator = 
-         await ctx.stub.getStateByPartialCompositeKey(SupplyChain.evalIndexName, []);
+         await ctx.stub.getStateByPartialCompositeKey(SupplyChain.evalIndexName, ['dispatchedToSupplier']);
 
         while (true) {
             const responseRange = await resultsIterator.next();
@@ -253,20 +142,150 @@ export class SupplyChain extends BasicContract {
                 attributes
             } = await ctx.stub.splitCompositeKey(responseRange.value.key));
 
-            ret.push(attributes);
-
-            let returnedItem = attributes[0];
-            let returnedEval = attributes[1];
-            console.log(`Found item ${returnedItem} with eval ${returnedEval}`);
+            let data = await this.queryByFullKey(ctx, attributes)
+            if (data['dst'] == supplier_id){
+                let item = await this.queryItemInfoByIdx(ctx, attributes[1])
+                ret.push(item)
+            }
         }
         return JSON.stringify(ret);
     }
+    public async confirmReceivedFromManufacturer(ctx: Context, id: string, data: string)
+    {
+        let oldKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['dispatchedToSupplier', id]);
+        await this.remove(ctx, oldKey)
+        let indexKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['onShelf', id]);
 
-    public async queryEvaluation(ctx: Context, tgtItem:string): Promise<string> {
-  
-      // This will execute a key range query on all keys starting with 'tgtItem'
+        await ctx.stub.putState(indexKey, JSON.parse(data));
+    }
+    public async sellToBuyer(ctx: Context, id: string, data: string)
+    {
+        let oldKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['onShelf', id]);
+        await this.remove(ctx, oldKey)
+        let indexKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['sold', id]);
+        await ctx.stub.putState(indexKey, JSON.parse(data));
+
+        let d = JSON.parse(data)
+        let buyer = d['dst']
+        let buyerKey = await ctx.stub.createCompositeKey(
+            SupplyChain.buyerIndexName, [id, buyer]);
+
+        await ctx.stub.putState(buyerKey, Buffer.from('\u0000'));
+    }
+    public async listPhones(ctx: Context): Promise<string>
+    {
+        let ret = [];
+        
+        // This will execute a key range query on all keys for evalIndexName
         let resultsIterator = 
-            await ctx.stub.getStateByPartialCompositeKey(SupplyChain.evalIndexName, [tgtItem]);
+         await ctx.stub.getStateByPartialCompositeKey(SupplyChain.evalIndexName, ['onShelf']);
+
+        while (true) {
+            const responseRange = await resultsIterator.next();
+            if (!responseRange || !responseRange.value || !responseRange.value.key) {
+                break;
+            }
+            console.log(responseRange.value.key);
+
+            let objectType;
+            let attributes;
+            ({
+                objectType,
+                attributes
+            } = await ctx.stub.splitCompositeKey(responseRange.value.key));
+            
+            let item = await this.queryItemInfoByIdx(ctx, attributes[1])
+            ret.push(item)
+        }
+        return JSON.stringify(ret);
+    }
+    public async dispatchToManufacturer(ctx: Context, id: string, data, string)
+    {
+        let oldKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['sold', id]);
+        await this.remove(ctx, oldKey)
+        let indexKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['dispatchedForRecycling', id]);
+        await ctx.stub.putState(indexKey, JSON.parse(data));
+    }
+    public async listReceivedForRecycle(ctx: Context, manufacturer_id: string): Promise<string>
+    {
+        let ret = [];
+        
+        // This will execute a key range query on all keys for evalIndexName
+        let resultsIterator = 
+         await ctx.stub.getStateByPartialCompositeKey(SupplyChain.evalIndexName, ['dispatchedForRecycling']);
+
+        while (true) {
+            const responseRange = await resultsIterator.next();
+            if (!responseRange || !responseRange.value || !responseRange.value.key) {
+                break;
+            }
+            console.log(responseRange.value.key);
+
+            let objectType;
+            let attributes;
+            ({
+                objectType,
+                attributes
+            } = await ctx.stub.splitCompositeKey(responseRange.value.key));
+
+            let data = await this.queryByFullKey(ctx, attributes)
+            if (data['dst'] == manufacturer_id){
+                let item = await this.queryItemInfoByIdx(ctx, attributes[1])
+                ret.push(item)
+            }
+        }
+        return JSON.stringify(ret);
+    }
+    public async recycle(ctx: Context, id: string, data: string)
+    {
+        let oldKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['dispatchedForRecycling', id]);
+        await this.remove(ctx, oldKey)
+        let indexKey = await ctx.stub.createCompositeKey(
+            SupplyChain.evalIndexName, ['recycled', id]);
+        await ctx.stub.putState(indexKey, JSON.parse(data));
+
+        let item = await this.queryItemInfoByIdx(ctx, id);
+        let buyer = await this.getBuyerOfPhone(ctx, id);
+        let details = JSON.parse(item)
+        // give tokens
+        await this.transferTokens(ctx, buyer, details.token_value)
+
+    }
+    public async viewBalance(ctx:Context, id): Promise<number>
+    {
+        const valAsBytes = await ctx.stub.getState(BasicContract.mkKey('balance', id));  
+        if (!valAsBytes || valAsBytes.length === 0) {
+            throw new Error(`does not exist`);
+        }
+        let previousBalance = valAsBytes.toString();
+        return +previousBalance;
+    }
+    protected async transferTokens(ctx: Context, to: string, amount: number)
+    {
+        let currentBalance = await this.viewBalance(ctx, to)
+        await this.create(ctx, 'balance', to, amount+currentBalance)
+    }
+    public async redeemTokens(ctx: Context, buyer_id: string, amount: number): Promise<boolean>
+    {
+        let currentBalance = await this.viewBalance(ctx, buyer_id)
+        if(currentBalance - amount >= 0)
+        {
+            await this.transferTokens(ctx, buyer_id, -amount)
+            return true
+        }
+        return false
+    }
+    protected async getBuyerOfPhone(ctx: Context, id: string): Promise<string>
+    {
+        let resultsIterator = 
+            await ctx.stub.getStateByPartialCompositeKey(SupplyChain.buyerIndexName, [id]);
   
         
         const responseRange = await resultsIterator.next();
@@ -282,11 +301,32 @@ export class SupplyChain extends BasicContract {
             attributes
         } = await ctx.stub.splitCompositeKey(responseRange.value.key));
 
-        let returnedItem = attributes[0];
-        let returnedEval = attributes[1];
-        console.log(`Found item ${returnedItem} with eval ${returnedEval}`);
+        let buyer = attributes[1];
+        
+        return buyer.toString();
+    }
 
-        return returnedEval;    
+    /*  Returns a single evaluations related to item */
+    public async queryEvaluationByItem(ctx:Context, tgtTag:string): Promise<string> {
+        return await this.query(ctx, 'evaluation', tgtTag);
+    }
+  
+    public async queryAllItemInfos(ctx: Context):Promise<string> {
+        return await this.queryFullRange(ctx, 'phone');
+    }
+
+    public async queryItemInfoByIdx(ctx: Context, id: string):Promise<string> {
+        return await this.query(ctx, 'phone', id);
+    }
+
+    public async grabAllInfos(ctx: Context):Promise<Phone[]> {
+        const infosStr = await this.queryAllItemInfos(ctx);
+        const infosKV = JSON.parse(infosStr);
+        //const infosKeys = infosKV.map(it => it["Key"]); 
+        const allInfos = infosKV.map(it => JSON.parse(it["Record"])); 
+        console.log(allInfos);
+
+        return allInfos;
     }
 
 }

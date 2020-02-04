@@ -26,22 +26,42 @@ async function main() {
         //console.log(`Wallet path: ${walletPath}`);
 
         // Check to see if we've already enrolled the user.
-        const userExists = await wallet.exists('user1');
-        if (!userExists) {
-            console.error('An identity for the user "user1" does not exist in the wallet');
-            console.error('Run the registerUser.ts application before retrying');
-            return;
-        }
+        // const userExists = await wallet.exists('user1');
+        // if (!userExists) {
+        //    console.error('An identity for the user "user1" does not exist in the wallet');
+        //    console.error('Run the registerUser.ts application before retrying');
+        //    return;
+        //}
 
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
-        await gateway.connect(ccpPath, { wallet, identity: 'user1', discovery: { enabled: true, asLocalhost: true } });
+        await gateway.connect(ccpPath, { wallet, identity: 'admin', discovery: { enabled: true, asLocalhost: true } });
 
         // Get the network (channel) our contract is deployed to.
         const network = await gateway.getNetwork('mychannel');
 
         // Get the contract from the network.
         const contract = network.getContract(contractName);
+
+        if (args["cmd"].includes('register'){
+            name = args["key"].toString()
+            // Get the CA client object from the gateway for interacting with the CA.
+            const ca = gateway.getClient().getCertificateAuthority();
+            const adminIdentity = gateway.getCurrentIdentity();
+            switch (args["cmd"]) {
+                case "register_buyer":{
+                    createBuyer(ca, adminIdentity, name)
+                }
+                case "register_supplier":{
+                    createSupplier(ca, adminIdentity, name)
+                }
+                case "register_manufacturer":{
+                    createManufacturer(ca, adminIdentity, name)
+                }
+                default:
+                    throw new Error(`Bad command-line argument for --cmd: ${args["cmd"]}`); 
+
+        }
 
         // Evaluate the specified transaction from the command line
         const result = await dispatchCmd(args, contract);
@@ -87,69 +107,70 @@ function decrypt(ciphertext:string)
     const plaintext = key.decrypt(ciphertext, 'utf8');
     return plaintext;
 }
+function createBuyer(ca, adminIdentity, buyer_name: string)
+{
+    // Register the user, enroll the user, and import the new identity into the wallet.
+    const secret = await ca.register({ affiliation: 'buyers', enrollmentID: buyer_name, role: 'client' }, adminIdentity);
+    const enrollment = await ca.enroll({ enrollmentID: buyer_name, enrollmentSecret: secret });
+    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
+    await wallet.import(buyer_name, userIdentity);
+    console.log('Successfully registered and enrolled client user and imported it into the wallet');
 
+}
+function createSupplier(ca, adminIdentity, sup_name: string)
+{
+    // Register the user, enroll the user, and import the new identity into the wallet.
+    const secret = await ca.register({ affiliation: 'suppliers', enrollmentID: sup_name, role: 'client' }, adminIdentity);
+    const enrollment = await ca.enroll({ enrollmentID: sup_name, enrollmentSecret: secret });
+    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
+    await wallet.import(sup_name, userIdentity);
+    console.log('Successfully registered and enrolled client user and imported it into the wallet');
+}
+function createManufacturer(ca, adminIdentity, man_name: string)
+{
+    // Register the user, enroll the user, and import the new identity into the wallet.
+    const secret = await ca.register({ affiliation: 'manufacturers', enrollmentID: man_name, role: 'client' }, adminIdentity);
+    const enrollment = await ca.enroll({ enrollmentID: man_name, enrollmentSecret: secret });
+    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
+    await wallet.import(man_name, userIdentity);
+    console.log('Successfully registered and enrolled client user and imported it into the wallet');
+}
 
 async function dispatchCmd(args, contract):Promise<string>
 {
 
     /* NB: one needs submitTransaction for updates and evaluateTransaction for queries */
     switch (args["cmd"]) {
-        case "addPhone":
-        {
+        case "producePhone":{ // requires --id, --name, --manufacturer_id, --token_value
             const info = {
-                "docType" : "phoneInfo",
-                "uuid"  : args["uuid"],
-                "model" : args["model"],
-                "manufacturer" : args["manufacturer"],
-                "tokensPrice" : args["tokensPrice"]
-            };
-            const info_str = JSON.stringify(info as chaincode.PhoneInfo)
-            await contract.submitTransaction('addPhone', info_str);
-            return JSON.stringify(`Successfully produced phone #${args["uuid"]}!`);
+                "doctype": "phone",
+                "name": args["name"],
+                "manufacturer": args["manufacturer_id"],
+                "date": new Date(),
+                "token_value": args["token_value"]
+            }
+            const info_str = JSON.stringify(info as chaincode.Phone);
+            await contract.submitTransaction(
+                'producePhone', 
+                args["id"].toString(),
+                info_str);
+            
+            return JSON.stringify(`Successfully added phone #${args["id"]}!`);
         }
-        case "sellPhone":
-        {
+        case "listProduced":{  // requires --manufacturer_id
+            const result = await contract.evaluateTransaction('listProduced', args["manufacturer_id"].toString());
+            return result; }
+        case "dispatchToSupplier": { // requires --id, --manufacturer_id, --supplier_id
             const info = {
-                "uuid" : args["uuid"],
-                "user" : args["user"],
-            };
-            const info_str = JSON.stringify(info);
-            await contract.submitTransaction('sellPhone', info_str);
-            return JSON.stringify(`Successfully sold phone #${args["uuid"]}!`);
+                "doctype": "state",
+                "date": new Date(),
+                "src": args["manufacturer_id"],
+                "dst": args["supplier_id"]
+            }
+            const info_str = JSON.stringify(info as chaincode.PhoneState);
+            await contract.submitTransaction('dispatchToSupplier', args['id'].toString(), info_str);
+            return JSON.stringify(`Successfully dispatched phone #${args["id"]}! to supplier`);
         }
-
-        case "listProducedPhones":
-        {
-            const result = await contract.evaluateTransaction('listProducedPhones', args["manufacturer"]);
-            return result;
-        }
-        case "listReceivedForRecycling":
-        {
-            const result = await contract.evaluateTransaction('listReceivedForRecycling', args["manufacturer"]);
-            return result;
-        }
-
-        case "queryLifetimeByManufacturer":
-        {
-            const result = await contract.evaluateTransaction('queryLifetimeByManufacturer', args["manufacturer"]);
-            return result;
-        }
-        case "queryNumberOfProducedPhonesByManufacturer":
-        {
-            const result = await contract.evaluateTransaction('queryNumberOfProducedPhonesByManufacturer', args["manufacturer"]);
-            return result;
-        }
-
-
-        case "reset":{  
-            await contract.submitTransaction('clearAllState');
-            return JSON.stringify("Success."); }
-        case "querySimple":{  // requires --key
-            const result = await contract.evaluateTransaction('querySimple', args["key"].toString());
-            return result; }
-        case "queryAllItemInfos": { 
-            const result = await contract.evaluateTransaction('grabAllInfos');
-            return result; }
         case "queryAllEvaluations": { 
             const result = await contract.evaluateTransaction('queryAllEvaluations');
             return result; }
@@ -161,18 +182,20 @@ async function dispatchCmd(args, contract):Promise<string>
             return result; }
         case "queryItemInfosBySrc": { // requires --src
             const result = await contract.evaluateTransaction('queryInfosByItemSrc', args["src"]);
-            return result; }
-        case "gitqueryItemInfoByIdx": {
-            const result = await contract.evaluateTransaction('queryItemInfoByIdx', args["idx"].toString());
-            return result; }
+            return result;
+        }
         case "queryPendingItemInfos": { // requires --user
             const result = await contract.evaluateTransaction('queryPendingItemInfos', args["user"]);
-            return result; }
+            return result;
+        }
+        
         case "queryEvaluation": { // requires --item
-            const result = await contract.evaluateTransaction('queryEvaluation', args["item"].toString());
+            const result = await contract.evaluateTransaction(
+                'queryEvaluation', args["item"].toString());
             return result; }
         case "updateEvaluation": { // requires --item
-            await contract.submitTransaction('updateEvaluationOnItem', args["item"].toString());
+            await contract.submitTransaction(
+                'updateEvaluationOnItem', args["item"].toString());
             return JSON.stringify("Success."); }
         case "addItemInfo": { // requires --idx, --item, --src, --dst and --footprint
             const info = {
@@ -182,12 +205,60 @@ async function dispatchCmd(args, contract):Promise<string>
                 "dst" : args["dst"],
                 "footprint" : encrypt(args["footprint"].toString()) // we encrypt footprint
             };
-            const info_str = JSON.stringify(info as chaincode.PhoneInfo);
+            const info_str = JSON.stringify(info as chaincode.ItemInfo);
             await contract.submitTransaction(
                 'addSimple', 
                 "iteminfo" + args["idx"].toString(),
                 info_str );
             return JSON.stringify(`Successfully added info #${args["idx"]}!`); }
+        case "addPhone":{ // requires --id, --name, --manufacturer
+            const info = {
+                "doctype": "phone",
+                "name": args["name"],
+                "manufacturer": args["manufacturer"],
+                "date": new Date()
+            }
+            const state = {
+                "doctype": "state",
+                "state": "produced",
+                "src": args["manufacturer"],
+                "dst": args["manufacturer"],
+                "date": new Date()
+            }
+            const info_str = JSON.stringify(info as chaincode.Phone);
+            const state_str = JSON.stringify(info as chaincode.PhoneState);
+            await contract.submitTransaction(
+                'addPhone', 
+                args["id"].toString(),
+                info_str );
+            await contract.submitTransaction(
+                'changeState', 
+                args["id"].toString(),
+                state_str);
+            return JSON.stringify(`Successfully added phone #${args["id"]}!`);
+        }
+        case "changeState":{ // --id, --state, --src, --dst
+            const info = {
+                "doctype": "state",
+                "state": args["state"],
+                "src": args["src"],
+                "dst": args["dst"],
+                "date": new Date()
+            }
+            const state_str = JSON.stringify(info as chaincode.PhoneState);
+            await contract.submitTransaction(
+                'changeState', 
+                args["id"].toString(),
+                state_str);
+            return JSON.stringify(`Successfully changed state for #${args["id"]}!`);
+        }
+        case "queryItemInfoByIdx": {
+            const result = await
+            contract.evaluateTransaction(
+                'queryItemInfoByIdx',
+                args["idx"].toString());
+            return result; 
+        } 
         default:
             throw new Error(`Bad command-line argument for --cmd: ${args["cmd"]}`); 
     }
