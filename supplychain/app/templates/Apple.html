@@ -4,9 +4,9 @@
     <title>
         Apple Main Page {% block title %}{% endblock %}
     </title>
-    <link rel="stylesheet" href="apple.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='apple.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type=text/javascript src="{{ url_for('static', filename='client.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='client.js') }}"></script>
   
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
 </head>

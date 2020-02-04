@@ -54,6 +54,32 @@ def index():
     #    'index.html', 
     #    success_str = success_str)
 
+@app.route('/manufacturer')
+def manufacturer():
+    return render_template('ManufacturerMain.html')
+
+@app.route('/supplier')
+def supplier():
+    return render_template('supplier.html')
+
+@app.route('/user')
+def user():
+    return render_template('UserProf.html')
+
+@app.route('/manufacturer/apple')
+def apple():
+    return render_template('Apple.html')
+
+@app.route('/phones/iphone')
+def iphone():
+    return render_template('iPhone.html')
+
+
+
+
+
+
+
 @app.route('/farmer')
 def farmer():
     return render_with_user('farmer.html')
