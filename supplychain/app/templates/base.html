@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+        Smart Contract Client {% block title %}{% endblock %}
+    </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type=text/javascript src="{{ url_for('static', filename='client.js') }}"></script>
+</head>
+<body>
+        
+    <span class="menu">
+    Farmer <a href="/farmer">F0</a> <a href="/farmer?user=1">F1</a>
+    </span>
+
+    <span class="menu">
+        Shipper <a href="/shipper">S0</a> <a href="/shipper?user=1">S1</ahref="/shipper?user=1">
+    </span>
+
+    <span class="menu">
+        <a href="/evaluator">Evaluator</a>
+    </span>
+    <hr>
+
+    {% block header %}{% endblock %}   
+    
+    {% block aboveLogs %}{% endblock %}   
+
+    {% block logs %}{% endblock %}       
+
+    {% block belowLogs %}{% endblock %}   
+
+</body>
+</html>

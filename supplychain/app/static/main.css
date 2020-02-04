@@ -1,0 +1,14 @@
+.body { margin: 40px; }
+
+.keepgray {
+  background-color: darkgray;
+  width: 70px;
+}
+
+.small-input {
+  width: 50px;
+}
+
+.menu {
+  margin: 10px;
+}

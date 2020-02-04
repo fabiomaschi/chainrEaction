@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+(Shipper #{{user}})
+{% endblock %}
+
+{% block header %}
+<h1> Supplychain - Shipper #{{user}} </h1>
+<img src="{{ url_for('static', filename='S' + user + '.png') }}">
+{% endblock %}
+
+{% block aboveLogs %}
+{% endblock %}
+
+{% block logs %}
+<div id="log-items-wrapper">
+  <h2>My Item Infos:</h2>
+  <div id="log-items"></div>
+</div>
+{% endblock %}
+
+{% block belowLogs %}
+<div id="add-div">
+            <input type="hidden"  id="userid" value="S{{user}}">
+            <h2>My pending items:</h2>
+            <div id="pending-items">
+            </div>
+            <h4>{{ success_str }}</h4>
+    </div>
+{% endblock %}   
+

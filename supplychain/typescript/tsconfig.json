@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "target": "es5",
+       "moduleResolution": "node",
+        //"module": "commonjs",
+        "declaration": true,
+        "sourceMap": true,
+        "allowSyntheticDefaultImports": true,
+        "skipLibCheck": true,
+        },
+    "include": [
+        "./src/**/*",
+    ],
+    "exclude": [
+        "./src/**/*.spec.ts"
+    ],
+    "noImplicitAny": false
+}

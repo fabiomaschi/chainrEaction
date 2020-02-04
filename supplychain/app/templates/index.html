@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+(Supplychain Page)
+{% endblock %}
+
+{% block header %}
+<h1> Supplychain Page </h1>
+{% endblock %}
+
+{% block aboveLogs %}
+{% endblock %}
+
+{% block belowLogs %}
+<div id="add-div">
+            <h2>Add info on good</h2>
+            <form action="newiteminfo" method="post">
+                <input type="text"  name="tag" id="tag-text" value="Item Tag">
+                <input type="text"  name="val" id="val-text" value="Carbon Footprint">
+                <select name="infotype">
+                    <option value="F2S">Farmer to Shipper</option>
+                    <option value="S2D">Shipper to Distributor</option>
+                  </select>            
+                <input type="submit" value="New Tag"><br>
+            </form>
+            <h4>{{ success_str }}</h4>
+    </div>
+{% endblock %}   
+

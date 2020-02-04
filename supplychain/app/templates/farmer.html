@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+(Farmer #{{user}})
+{% endblock %}
+
+{% block header %}
+<h1> Supplychain - Farmer #{{user}} </h1>
+<img src="{{ url_for('static', filename='F' + user + '.png') }}">
+{% endblock %}
+
+{% block logs %}
+<div id="log-items-wrapper">
+  <h2>My Item Infos:</h2>
+  <div id="log-items"></div>
+</div>
+{% endblock %}
+
+{% block aboveLogs %}
+{% endblock %}
+
+{% block belowLogs %}
+<div id="add-div">
+            <h2>Add info on good</h2>
+            <form action="newiteminfo" method="post">
+                <input type="hidden"  name="user" id="userid" value="F{{user}}">
+                <input type="text"  name="tag" id="tag-text" placeholder="Item Tag (e.g. Cabbage)">
+                <input type="number"  class="small-input" name="val" id="val-text" value="0">
+                <select name="infodst">
+                    <option value="S0">To Shipper #0</option>
+                    <option value="S1">To Shipper #1</option>
+                  </select>            
+                <input type="submit" value="New Tag"><br>
+            </form>
+            <h4>{{ success_str }}</h4>
+    </div>
+{% endblock %}   
+
