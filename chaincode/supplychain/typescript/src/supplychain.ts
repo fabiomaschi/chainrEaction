@@ -74,7 +74,7 @@ export class SupplyChain extends BasicContract {
 
     public async initLedger(ctx: Context) {
         console.info('============= START : Initialize Ledger ===========');
-        
+        await this.create(ctx, 'genesis', 'init', 1)
         console.info('============= END : Initialize Ledger ===========');
     }
     //Manufacturer
@@ -258,9 +258,9 @@ export class SupplyChain extends BasicContract {
         await this.transferTokens(ctx, buyer, details.token_value)
 
     }
-    public async viewBalance(ctx:Context, id): Promise<number>
+    public async viewBalance(ctx:Context, buyer_id: string): Promise<number>
     {
-        const valAsBytes = await ctx.stub.getState(BasicContract.mkKey('balance', id));  
+        const valAsBytes = await ctx.stub.getState(BasicContract.mkKey('balance', buyer_id));  
         if (!valAsBytes || valAsBytes.length === 0) {
             throw new Error(`does not exist`);
         }
