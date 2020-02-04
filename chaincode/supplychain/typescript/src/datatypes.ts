@@ -20,20 +20,20 @@ export interface ItemInfo {
     dst: string;
 }
 export interface Phone {
-	doctype?:  string;
-	name: string;
+    doctype?:  string;
+    name: string;
     manufacturer: string;
     date: string;
     token_value: number;
 }
-export interface PhoneState{
-	doctype?:  string;
-	date: string;
-	src: string;
-	dst: string;
+export interface PhoneState {
+    doctype?:  string;
+    date: string;
+    src: string;
+    dst: string;
 }
-export interface Balance{
-	doctype?:  string;
-	amount: number;
-	date: string;
+export interface Balance {
+    doctype?:  string;
+    amount: number;
+    date: string;
 }

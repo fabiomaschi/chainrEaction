@@ -43,26 +43,6 @@ async function main() {
         // Get the contract from the network.
         const contract = network.getContract(contractName);
 
-        if (args["cmd"].includes('register'){
-            name = args["key"].toString()
-            // Get the CA client object from the gateway for interacting with the CA.
-            const ca = gateway.getClient().getCertificateAuthority();
-            const adminIdentity = gateway.getCurrentIdentity();
-            switch (args["cmd"]) {
-                case "register_buyer":{
-                    createBuyer(ca, adminIdentity, name)
-                }
-                case "register_supplier":{
-                    createSupplier(ca, adminIdentity, name)
-                }
-                case "register_manufacturer":{
-                    createManufacturer(ca, adminIdentity, name)
-                }
-                default:
-                    throw new Error(`Bad command-line argument for --cmd: ${args["cmd"]}`); 
-
-        }
-
         // Evaluate the specified transaction from the command line
         const result = await dispatchCmd(args, contract);
 
@@ -80,7 +60,7 @@ async function main() {
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
         process.exit(1);
-    }
+    } 
 }
 
 // for encryption/decryption
@@ -107,34 +87,6 @@ function decrypt(ciphertext:string)
     const plaintext = key.decrypt(ciphertext, 'utf8');
     return plaintext;
 }
-function createBuyer(ca, adminIdentity, buyer_name: string)
-{
-    // Register the user, enroll the user, and import the new identity into the wallet.
-    const secret = await ca.register({ affiliation: 'buyers', enrollmentID: buyer_name, role: 'client' }, adminIdentity);
-    const enrollment = await ca.enroll({ enrollmentID: buyer_name, enrollmentSecret: secret });
-    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
-    await wallet.import(buyer_name, userIdentity);
-    console.log('Successfully registered and enrolled client user and imported it into the wallet');
-
-}
-function createSupplier(ca, adminIdentity, sup_name: string)
-{
-    // Register the user, enroll the user, and import the new identity into the wallet.
-    const secret = await ca.register({ affiliation: 'suppliers', enrollmentID: sup_name, role: 'client' }, adminIdentity);
-    const enrollment = await ca.enroll({ enrollmentID: sup_name, enrollmentSecret: secret });
-    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
-    await wallet.import(sup_name, userIdentity);
-    console.log('Successfully registered and enrolled client user and imported it into the wallet');
-}
-function createManufacturer(ca, adminIdentity, man_name: string)
-{
-    // Register the user, enroll the user, and import the new identity into the wallet.
-    const secret = await ca.register({ affiliation: 'manufacturers', enrollmentID: man_name, role: 'client' }, adminIdentity);
-    const enrollment = await ca.enroll({ enrollmentID: man_name, enrollmentSecret: secret });
-    const userIdentity = X509WalletMixin.createIdentity('Org1MSP', enrollment.certificate, enrollment.key.toBytes());
-    await wallet.import(man_name, userIdentity);
-    console.log('Successfully registered and enrolled client user and imported it into the wallet');
-}
 
 async function dispatchCmd(args, contract):Promise<string>
 {
@@ -146,7 +98,7 @@ async function dispatchCmd(args, contract):Promise<string>
                 "doctype": "phone",
                 "name": args["name"],
                 "manufacturer": args["manufacturer_id"],
-                "date": new Date(),
+                "date": new Date().toString(),
                 "token_value": args["token_value"]
             }
             const info_str = JSON.stringify(info as chaincode.Phone);
@@ -163,7 +115,7 @@ async function dispatchCmd(args, contract):Promise<string>
         case "dispatchToSupplier": { // requires --id, --manufacturer_id, --supplier_id
             const info = {
                 "doctype": "state",
-                "date": new Date(),
+                "date": new Date().toString(),
                 "src": args["manufacturer_id"],
                 "dst": args["supplier_id"]
             }
@@ -216,17 +168,18 @@ async function dispatchCmd(args, contract):Promise<string>
                 "doctype": "phone",
                 "name": args["name"],
                 "manufacturer": args["manufacturer"],
-                "date": new Date()
+                "date": new Date().toString(),
+                "token_value": 0
             }
             const state = {
                 "doctype": "state",
                 "state": "produced",
                 "src": args["manufacturer"],
                 "dst": args["manufacturer"],
-                "date": new Date()
+                "date": new Date().toString()
             }
             const info_str = JSON.stringify(info as chaincode.Phone);
-            const state_str = JSON.stringify(info as chaincode.PhoneState);
+            const state_str = JSON.stringify(state as chaincode.PhoneState);
             await contract.submitTransaction(
                 'addPhone', 
                 args["id"].toString(),
@@ -243,7 +196,7 @@ async function dispatchCmd(args, contract):Promise<string>
                 "state": args["state"],
                 "src": args["src"],
                 "dst": args["dst"],
-                "date": new Date()
+                "date": new Date().toString()
             }
             const state_str = JSON.stringify(info as chaincode.PhoneState);
             await contract.submitTransaction(
