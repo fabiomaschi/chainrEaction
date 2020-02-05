@@ -112,6 +112,7 @@ async function dispatchCmd(args, contract):Promise<string>
         case "listProduced":{  // requires --manufacturer_id
             const result = await contract.evaluateTransaction('listProduced', args["manufacturer_id"].toString());
             return result; }
+            
         case "dispatchToSupplier": { // requires --id, --manufacturer_id, --supplier_id
             const info = {
                 "doctype": "state",

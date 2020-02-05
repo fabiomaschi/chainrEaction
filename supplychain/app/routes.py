@@ -58,6 +58,10 @@ def index():
 def manufacturer():
     return render_template('ManufacturerMain.html')
 
+@app.route('/manufacturer/dispatch')
+def manufacturer_dispatch():
+    return render_template('dispatch.html')
+
 @app.route('/supplier')
 def supplier():
     return render_template('supplier.html')
@@ -79,18 +83,19 @@ def iphone():
 
 
 
+@app.route('/dispatch', methods = ['POST'])
+def dispatchPhone():
+    serial = request.form.get('serial')
+    supp = request.form.get('infodst')
 
-@app.route('/farmer')
-def farmer():
-    return render_with_user('farmer.html')
+    rst = [
+        "--id", serial,
+        "--manufacturer_id", "M0",
+        "--supplier_id", supp
+    ]
+    output = run_node_cmd('dispatchToSupplier', rst)
+    return redirect(url_for("manufacturer/dispatch"))
 
-@app.route('/shipper')
-def shipper():
-    return render_with_user('shipper.html')
-
-@app.route('/evaluator')
-def evaluator():
-    return render_template('evaluator.html')
 
 @app.route('/myitems')
 def items():
